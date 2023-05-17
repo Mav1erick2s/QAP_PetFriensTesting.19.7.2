@@ -29,15 +29,13 @@ def test_get_all_pets_with_valid_key(filter=''):
     assert len(result['pets']) > 0
 
 
-
-
 def test_add_new_pet_with_valid_data(name='Барбоскин', animal_type='двортерьер',
                                      age='4', pet_photo='images/cat1.jpg'):
     """Проверяем что можно добавить питомца с корректными данными"""
 
     # Получаем полный путь изображения питомца и сохраняем в переменную pet_photo
     pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
-
+    print(pet_photo)
     # Запрашиваем ключ api и сохраняем в переменую auth_key
     _, auth_key = pf.get_api_key(valid_email, valid_password)
 
@@ -45,14 +43,14 @@ def test_add_new_pet_with_valid_data(name='Барбоскин', animal_type='д�
     status, result = pf.add_new_pet(auth_key, name, animal_type, age, pet_photo)
 
     # Сверяем полученный ответ с ожидаемым результатом
+
     assert status == 200
     assert result['name'] == name
 
 
 def test_add_new_pet_with_valid_data_simple(name='Барбоскин23', animal_type='двортерьер-mm',
-                                     age='4',):
+                                            age='4', ):
     """Проверяем что можно добавить питомца с корректными данными"""
-
 
     # Запрашиваем ключ api и сохраняем в переменую auth_key
     _, auth_key = pf.get_api_key(valid_email, valid_password)
@@ -62,6 +60,21 @@ def test_add_new_pet_with_valid_data_simple(name='Барбоскин23', animal_
 
     # Сверяем полученный ответ с ожидаемым результатом
     assert status == 200
+    assert result['name'] == name
+
+
+def test_add_new_pet_with_valid_data_simple_not_current(name='', animal_type='двортерьер-mm',
+                                                        age='4', ):
+    """Проверяем, что добавить питомца с некоректными данными невозможно"""
+
+    # Запрашиваем ключ api и сохраняем в переменую auth_key
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+
+    # Добавляем питомца
+    status, result = pf.add_new_pet_simple(auth_key, name, animal_type, age)
+
+    # Сверяем полученный ответ с ожидаемым результатом
+    assert status == 404 # При введении невалидных данных статут код 404. Баг: статус код 200
     assert result['name'] == name
 
 
@@ -91,6 +104,25 @@ def test_successful_delete_self_pet():
 
 def test_successful_update_self_pet_info(name='Мурзик', animal_type='Котэ', age=5):
     """Проверяем возможность обновления информации о питомце"""
+
+    # Получаем ключ auth_key и список своих питомцев
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+    _, my_pets = pf.get_list_of_pets(auth_key, "my_pets")
+
+    # Еслди список не пустой, то пробуем обновить его имя, тип и возраст
+    if len(my_pets['pets']) > 0:
+        status, result = pf.update_pet_info(auth_key, my_pets['pets'][0]['id'], name, animal_type, age)
+
+        # Проверяем что статус ответа = 200 и имя питомца соответствует заданному
+        assert status == 200
+        assert result['name'] == name
+    else:
+        # если спиок питомцев пустой, то выкидываем исключение с текстом об отсутствии своих питомцев
+        raise Exception("There is no my pets")
+
+
+def test_successful_update_self_pet_info_not_current(name='Мурзик', animal_type='Котэ', age=5):
+    """Проверяем возможность обновления информации о питомце c некоректными данными(все поля )"""
 
     # Получаем ключ auth_key и список своих питомцев
     _, auth_key = pf.get_api_key(valid_email, valid_password)
