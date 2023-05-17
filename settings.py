@@ -1,3 +1,3 @@
 
-valid_email = "vasya@mail.com"
-valid_password = "12345"
+valid_email = "komoltsevaa1703@gmail.com"
+valid_password = "karamelkinnaprieme"

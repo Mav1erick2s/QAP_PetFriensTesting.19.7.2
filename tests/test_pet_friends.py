@@ -29,6 +29,8 @@ def test_get_all_pets_with_valid_key(filter=''):
     assert len(result['pets']) > 0
 
 
+
+
 def test_add_new_pet_with_valid_data(name='Барбоскин', animal_type='двортерьер',
                                      age='4', pet_photo='images/cat1.jpg'):
     """Проверяем что можно добавить питомца с корректными данными"""
@@ -41,6 +43,22 @@ def test_add_new_pet_with_valid_data(name='Барбоскин', animal_type='д�
 
     # Добавляем питомца
     status, result = pf.add_new_pet(auth_key, name, animal_type, age, pet_photo)
+
+    # Сверяем полученный ответ с ожидаемым результатом
+    assert status == 200
+    assert result['name'] == name
+
+
+def test_add_new_pet_with_valid_data_simple(name='Барбоскин23', animal_type='двортерьер-mm',
+                                     age='4',):
+    """Проверяем что можно добавить питомца с корректными данными"""
+
+
+    # Запрашиваем ключ api и сохраняем в переменую auth_key
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+
+    # Добавляем питомца
+    status, result = pf.add_new_pet_simple(auth_key, name, animal_type, age)
 
     # Сверяем полученный ответ с ожидаемым результатом
     assert status == 200
